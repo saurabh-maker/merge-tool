@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Merger and Duplicate Finder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f4f7f6;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 2000px;
+      height: 90%;
+      overflow: hidden;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .header p {
+      margin: 5px 0 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .main-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .file-input-container {
+      margin-bottom: 20px;
+    }
+
+    .file-input-label {
+      display: block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+
+    .file-input-label i {
+      margin-right: 10px;
+    }
+
+    .file-input-label:hover {
+      background-color: #0056b3;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+      width: 100%;
+      margin-bottom: 10px;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+    }
+
+    .btn[disabled] {
+      background-color: #c6c8ca;
+      cursor: not-allowed;
+    }
+
+    .content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .content h2 {
+      color: #007bff;
+      margin-bottom: 10px;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .use-cases {
+      margin-top: 30px;
+    }
+
+    .use-cases h3 {
+      color: #007bff;
+      font-size: 20px;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .use-cases ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .use-cases li {
+      font-size: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .use-cases li i {
+      color: #28a745;
+      margin-right: 10px;
+    }
+
+    #result {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    table {
+      width: 400%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      overflow-x: auto;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 5px;
+      text-align: left;
+      background-color: #f8f9fa;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .highlight {
+      background-color: yellow;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Excel/CSV File Merger and Duplicate Finder</h1>
+      <p>Easily Merge Your Files and Clean Up Duplicates in Seconds</p>
+    </div>
+    <div class="main-content">
+      <div class="sidebar">
+        <h2>Options</h2>
+        <div class="file-input-container">
+          <label for="fileInput" class="file-input-label">
+            <i class="fas fa-upload"></i> Choose Files
+          </label>
+          <input type="file" id="fileInput" multiple accept=".csv, .xlsx" />
+        </div>
+        <button id="mergeButton" class="btn">Merge Files</button>
+        <button id="downloadCSVButton" class="btn" disabled>Download Merged CSV</button>
+        <button id="downloadExcelButton" class="btn" disabled>Download Merged Excel</button>
+      </div>
+      <div class="content">
+        <h2>Results</h2>
+        <div id="result"></div>
+        <div class="use-cases">
+          <h3>Why Use This Tool?</h3>
+          <ul>
+   
+  <li><i class="fas fa-check-circle"></i> Save time by quickly merging multiple CSV or Excel files.</li>
+  <li><i class="fas fa-check-circle"></i> Eliminate duplicate entries effortlessly.</li>
+  <li><i class="fas fa-check-circle"></i> Merge Excel and CSV files seamlessly to ensure data accuracy and consistency.</li>
+  <li><i class="fas fa-check-circle"></i> Download merged data in your preferred format.</li>
+  <li><i class="fas fa-check-circle"></i> User-friendly interface designed for everyone.</li>
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script>
+    document.getElementById('mergeButton').addEventListener('click', mergeFiles);
+
+    function mergeFiles() {
+      const fileInput = document.getElementById('fileInput');
+      const files = fileInput.files;
+      if (files.length === 0) {
+        alert("Please select at least one file.");
+        return;
+      }
+
+      const fileReaders = [];
+      for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          fileReaders.push(workbook);
+          if (fileReaders.length === files.length) {
+            processFiles(fileReaders);
+          }
+        };
+        reader.readAsArrayBuffer(files[i]);
+      }
+    }
+
+    function processFiles(fileReaders) {
+      let mergedData = [];
+      let headers = [];
+      let allRows = [];
+      let duplicateCount = 0;
+
+      fileReaders.forEach((workbook, index) => {
+        workbook.SheetNames.forEach(sheetName => {
+          const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+          if (index === 0 && headers.length === 0) {
+            headers = sheet[0];
+            mergedData.push(headers);
+          }
+          sheet.slice(1).forEach(row => allRows.push(row)); // Store all rows excluding headers
+        });
+      });
+
+      // Remove duplicates and count them
+      let uniqueRows = removeDuplicates(allRows, (duplicate) => duplicateCount++);  // Increment duplicate count for each duplicate found
+      mergedData = mergedData.concat(uniqueRows);
+
+      showResults(mergedData, duplicateCount);
+    }
+
+    function removeDuplicates(data, onDuplicate) {
+      let uniqueJSON = new Set();
+      return data.filter(row => {
+        let rowJSON = JSON.stringify(row);
+        if (uniqueJSON.has(rowJSON)) {
+          onDuplicate();  // Call onDuplicate function when a duplicate is found
+          return false;
+        } else {
+          uniqueJSON.add(rowJSON);
+          return true;
+        }
+      });
+    }
+
+    function showResults(mergedData, duplicateCount) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = "";
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const tbody = document.createElement('tbody');
+
+      table.appendChild(thead);
+      table.appendChild(tbody);
+
+      const headerRow = document.createElement('tr');
+      mergedData[0].forEach(header => {
+        const th = document.createElement('th');
+        th.innerText = header;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+
+      mergedData.slice(1).forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(cell => {
+          const td = document.createElement('td');
+          td.innerText = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      resultDiv.innerHTML = `<p>${mergedData.length - 1} entries have been merged. ${duplicateCount} duplicate entries removed.</p>`;
+      resultDiv.appendChild(table);
+
+      document.getElementById('downloadCSVButton').disabled = false;
+      document.getElementById('downloadExcelButton').disabled = false;
+
+      document.getElementById('downloadCSVButton').addEventListener('click', () => downloadFile('csv', mergedData));
+      document.getElementById('downloadExcelButton').addEventListener('click', () => downloadFile('xlsx', mergedData));
+    }
+
+    function downloadFile(type, data) {
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Merged Data");
+
+      if (type === 'csv') {
+        XLSX.writeFile(wb, "merged_data.csv");
+      } else {
+        XLSX.writeFile(wb, "merged_data.xlsx");
+      }
+    }
+  </script>
+</body>
+</html>
